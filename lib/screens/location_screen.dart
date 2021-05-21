@@ -1,12 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:climate/utilities/constants.dart';
+import 'package:climate/services/weather.dart';
 
 class LocationScreen extends StatefulWidget {
+  LocationScreen({this.locationWeather});
+
+  final locationWeather;
   @override
   _LocationScreenState createState() => _LocationScreenState();
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  int temperature;
+  String city;
+  int condition;
+  String w_cond, w_message;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print('data recieved');
+    updateUI(widget.locationWeather);
+  }
+
+  void updateUI(dynamic weatherData) {
+    setState(() {
+      double temp = weatherData['main']['temp'];
+      temperature = temp.toInt();
+      city = weatherData['name'];
+      condition = weatherData['weather'][0]['id'];
+      WeatherModel obj1 = WeatherModel();
+      w_cond = obj1.getWeatherIcon(condition);
+      w_message = obj1.getMessage(temperature);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,11 +78,11 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Row(
                   children: <Widget>[
                     Text(
-                      '32°',
+                      '$temperature',
                       style: kTempTextStyle,
                     ),
                     Text(
-                      '☀️',
+                      '$w_cond',
                       style: kConditionTextStyle,
                     ),
                   ],
@@ -62,7 +91,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  "It's 🍦 time in San Francisco!",
+                  "$w_message in $city",
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),
